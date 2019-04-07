@@ -6,20 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="715dp"
         android:layout_marginTop="10dp"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <RelativeLayout
+            android:id="@+id/connection_status_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/connection_status_layout">
+            app:layout_constraintBottom_toTopOf="@+id/battery_charge_layout"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/connection_status_text_view"
@@ -44,124 +49,132 @@
                 android:textSize="20dp"
                 android:theme="@style/Widget.AppCompat.Button.Borderless.Colored" />
         </RelativeLayout>
+
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:id="@+id/battery_charge_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_below="@+id/connection_status_layout">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/current_speed_layout"
+            app:layout_constraintTop_toBottomOf="@+id/connection_status_layout">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="30dp"
                 android:text="@string/battery_level"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="30dp"
-                android:textSize="25dp">
-            </TextView>
+                android:textSize="25dp"></TextView>
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/battery_percentage_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="80dp"
                 android:text="@string/battery_charge_0"
-                android:textSize="25dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="80dp">
-            </TextView>
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/current_speed_layout"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/battery_charge_layout">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/current_speed"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="30dp"
-                android:textSize="25dp">
-            </TextView>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/motor_speed"
-                android:id="@+id/current_motor_speed"
-                android:textSize="25dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="50dp">
-            </TextView>
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/set_speed_layout"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_below="@+id/current_speed_layout">
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/hundreds_list_view"
-                android:layout_alignParentLeft="true">
-            </ListView>
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/hundreds_list_view"
-                android:id="@+id/tens_list_view">
-            </ListView>
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/tens_list_view"
-                android:id="@+id/units_list_view"
-                android:layout_alignParentRight="true">
-            </ListView>
+                android:textSize="25dp"></TextView>
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/current_speed_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/set_speed_text_layout"
-            android:layout_below="@+id/set_speed_layout">
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/rpm_edit_text"
-                android:layout_alignParentLeft="true"
-                android:layout_marginRight="20dp"
-                android:hint="500"/>
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/set_speed_layout"
+            app:layout_constraintTop_toBottomOf="@+id/battery_charge_layout">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/rpm_edit_text"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="30dp"
+                android:text="@string/current_speed"
+                android:textSize="25dp"></TextView>
+
+            <TextView
+                android:id="@+id/current_motor_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"
-                android:text="@string/rpm"
-                android:layout_marginLeft="10dp"
-                />
+                android:layout_centerVertical="true"
+                android:layout_marginRight="50dp"
+                android:text="@string/motor_speed"
+                android:textSize="25dp"></TextView>
         </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/set_speed_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/set_speed_text_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/current_speed_layout">
+
+            <com.example.grindingmachine.DigitListView
+                android:id="@+id/hundreds_list_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp" />
+
+            <com.example.grindingmachine.DigitListView
+                android:id="@+id/tens_list_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp" />
+
+            <com.example.grindingmachine.DigitListView
+                android:id="@+id/units_list_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+
         <RelativeLayout
+            android:id="@+id/set_speed_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/set_speed_text_layout">
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/set_speed_layout">
+
+            <EditText
+                android:id="@+id/rpm_edit_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="70dp"
+                android:hint="500"
+                android:textSize="30dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="150dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@+id/rpm_edit_text"
+                android:text="@string/rpm"
+                android:textSize="30dp" />
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/rpm_edit_text"
+                android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:text="Set speed"
                 android:textSize="20dp"
-                android:theme="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+                android:theme="@style/Widget.AppCompat.Button.Borderless.Colored" />
         </RelativeLayout>
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

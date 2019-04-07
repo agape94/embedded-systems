@@ -10,9 +10,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListView mHundredsListView;
-    ListView mTensListView;
-    ListView mUnitsListView;
+    DigitListView mHundredsListView;
+    DigitListView mTensListView;
+    DigitListView mUnitsListView;
 
     ArrayList<String> mDigits;
     ArrayList<String> mDigits0;
@@ -58,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
         mHundredsAdapter = new DigitAdapter(this, mDigits);
         mTensAdapter = new DigitAdapter(this, mDigits0);
         mUnitsAdapter = new DigitAdapter(this, mDigits0);
+
+//        mHundredsAdapter.setmCount(3);
+//        mTensAdapter.setmCount(3);
+//        mUnitsAdapter.setmCount(3);
 
         // Instanciating an array list (you don't need to do this,
         // you already have yours).

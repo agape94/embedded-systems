@@ -10,9 +10,11 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class DigitAdapter extends ArrayAdapter {
+
+    private int mCount;
+
     public DigitAdapter(@NonNull Context context, @NonNull ArrayList<String> digitsList) {
         super(context,0, digitsList);
     }
@@ -31,4 +33,14 @@ public class DigitAdapter extends ArrayAdapter {
 
         return convertView;
     }
+
+//    @Override
+//    public int getCount() {
+//        return mCount;
+//    }
+
+    public void setmCount(int mCount) {
+        this.mCount = mCount;
+    }
+
 }
