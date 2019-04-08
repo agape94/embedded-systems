@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Grinding Machine</string>
+    <string name="connected_status">Connected</string>
+    <string name="button_disconnect">Disconnect</string>
+    <string name="battery_level">Battery level:</string>
+    <string name="battery_charge_0">0%</string>
+    <string name="current_speed">Current speed:</string>
+    <string name="motor_speed">1000 rpm</string>
+    <string name="rpm">RPM</string>
+    <string name="set_speed">Set speed</string>
 </resources>
