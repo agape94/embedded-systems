@@ -7,4 +7,5 @@
     <string name="current_speed">Current speed:</string>
     <string name="motor_speed">1000 rpm</string>
     <string name="rpm">RPM</string>
+    <string name="set_speed">Set speed</string>
 </resources>
