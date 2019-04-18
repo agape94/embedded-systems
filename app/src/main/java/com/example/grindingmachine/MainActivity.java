@@ -9,15 +9,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private NumberPicker mHundredsNumberPicker;
-    private NumberPicker mTensNumberPicker;
-    private NumberPicker mUnitsNumberPicker;
+    private SeekBar mMotorSpeedSeekbar;
     private EditText mSetSpeedValue;
     private int currentRPM;
 
@@ -31,99 +30,58 @@ public class MainActivity extends AppCompatActivity {
         mSetSpeedValue = findViewById(R.id.rpm_edit_text);
         mSetSpeedValue.setText(String.valueOf(currentRPM));
 
-        mHundredsNumberPicker = findViewById(R.id.hundreds_number_picker);
-        mTensNumberPicker = findViewById(R.id.tens_number_picker);
-        mUnitsNumberPicker = findViewById(R.id.units_number_picker);
+        mMotorSpeedSeekbar = findViewById(R.id.motorSpeedSeekBar);
 
-        mHundredsNumberPicker.setMinValue(0);
-        mHundredsNumberPicker.setMaxValue(9);
+        mMotorSpeedSeekbar.setMin(0);
+        mMotorSpeedSeekbar.setMax(999); //TODO Set to configurable value. Motor specific value
 
-        mTensNumberPicker.setMinValue(0);
-        mTensNumberPicker.setMaxValue(9);
-
-        mUnitsNumberPicker.setMinValue(0);
-        mUnitsNumberPicker.setMaxValue(9);
-
-        mHundredsNumberPicker.setClickable(false);
-        mTensNumberPicker.setClickable(false);
-        mUnitsNumberPicker.setClickable(false);
-
-        mHundredsNumberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                String currentRpm = mSetSpeedValue.getText().toString();
-                mSetSpeedValue.setText(replaceCharAtPos(currentRpm, 0, (char)(newVal + '0')));
-            }
-        });
-
-        mTensNumberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                String currentRpm = mSetSpeedValue.getText().toString();
-                mSetSpeedValue.setText(replaceCharAtPos(currentRpm, 1, (char)(newVal + '0')));
-            }
-        });
-
-        mUnitsNumberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                String currentRpm = mSetSpeedValue.getText().toString();
-                mSetSpeedValue.setText(replaceCharAtPos(currentRpm, 2, (char)(newVal + '0')));
-            }
-        });
         mSetSpeedValue.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                syncronizeRPMValue();
+                changeSeekBarValue();
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+        mMotorSpeedSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int currentRpmValue = seekBar.getProgress();
+                if(!mSetSpeedValue.getText().toString().isEmpty()) {
+                    if (currentRpmValue != Integer.parseInt(mSetSpeedValue.getText().toString())) {
+                        mSetSpeedValue.setText(String.valueOf(currentRpmValue));
+                        mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
+                    }else {
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
-    private void syncronizeRPMValue(){
-        char hundredsChar = '0';
-        char tensChar = '0';
-        char unitsChar = '0';
+    private void changeSeekBarValue(){
 
-        String currentRpmValue = mSetSpeedValue.getText().toString();
-
-        if(currentRpmValue.length() == 3) {
-            hundredsChar = currentRpmValue.charAt(0);
-            tensChar = currentRpmValue.charAt(1);
-            unitsChar = currentRpmValue.charAt(2);
-        }else if(currentRpmValue.length() == 2)
-        {
-            tensChar = currentRpmValue.charAt(0);
-            unitsChar = currentRpmValue.charAt(1);
-        }else if(currentRpmValue.length() == 1)
-        {
-            unitsChar = currentRpmValue.charAt(0);
+        int currentRpmValue;
+        if(!mSetSpeedValue.getText().toString().isEmpty()) {
+            currentRpmValue = Integer.parseInt(mSetSpeedValue.getText().toString());
+            mMotorSpeedSeekbar.setProgress(currentRpmValue, true);
         }else{
-            Toast.makeText(this,"Could not parse the RPM!", Toast.LENGTH_SHORT);
-            return;
+            mMotorSpeedSeekbar.setProgress(0, true);
         }
-
-        int hundreds = (int) hundredsChar - '0';
-        int tens = (int) tensChar - '0';
-        int units = (int) unitsChar - '0';
-
-        mHundredsNumberPicker.setValue((int) hundredsChar - '0');
-        mTensNumberPicker.setValue((int) tensChar - '0');
-        mUnitsNumberPicker.setValue((int) unitsChar - '0');
-    }
-
-    private String replaceCharAtPos(String oldString, int pos, char charToReplace){
-//        char[] myNameChars = oldString.toCharArray();
-//        myNameChars[pos] = charToReplace;
-//        String newString = String.valueOf(myNameChars);
-//        return newString;
-        StringBuilder old = new StringBuilder(oldString);
-        old.setCharAt(pos, charToReplace);
-        return old.toString();
     }
 }

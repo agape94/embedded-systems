@@ -117,29 +117,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/current_speed_layout">
 
-            <NumberPicker
-                android:id="@+id/hundreds_number_picker"
+            <SeekBar
+                android:id="@+id/motorSpeedSeekBar"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:theme="@style/NumberPickerText"
-                android:descendantFocusability="blocksDescendants" />
-
-            <NumberPicker
-                android:id="@+id/tens_number_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:theme="@style/NumberPickerText"
-                android:descendantFocusability="blocksDescendants" />
-
-            <NumberPicker
-                android:id="@+id/units_number_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:theme="@style/NumberPickerText"
-                android:descendantFocusability="blocksDescendants" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="10dp" />
         </LinearLayout>
 
         <android.support.constraint.ConstraintLayout
