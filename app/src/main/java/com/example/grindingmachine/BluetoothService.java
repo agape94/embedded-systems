@@ -25,9 +25,6 @@ public class BluetoothService {
     // Name for the SDP record when creating server socket
     private static final String NAME = "BluetoothService";
 
-    // Unique UUID for this application
-//    private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
-
     // Member fields
     private final BluetoothAdapter mAdapter;
     private final Handler mHandler;
@@ -43,7 +40,7 @@ public class BluetoothService {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
     /**
-     * Constructor. Prepares a new BluetoothChat session.
+     * Constructor. Prepares a new BluetoothService session.
      *
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
@@ -55,7 +52,7 @@ public class BluetoothService {
     }
 
     /**
-     * Set the current state of the chat connection
+     * Set the current state of the bluetooth connection
      *
      * @param state An integer defining the current connection state
      */
@@ -73,7 +70,7 @@ public class BluetoothService {
     }
 
     /**
-     * Start the chat service. Specifically start AcceptThread to begin a
+     * Start the bluetooth service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {

@@ -7,29 +7,21 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private SeekBar mMotorSpeedSeekbar;
     private EditText mSetSpeedValue;
-    private int currentRPM;
+    private int mCurrentRPM;
     private Button mBluetoothToggle;
     private Button mSetSpeedButton;
 
@@ -62,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, Constants.REQUEST_ENABLE_BT);
         } else {
-            // Initialize the BluetoothChatService to perform bluetooth connections
+            // Initialize the BluetoothService to perform bluetooth connections
             if(mBluetoothService == null) {
                 mBluetoothService = new BluetoothService(this, mHandler);
             }
@@ -90,17 +82,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Stop the Bluetooth chat services
+        // Stop the BluetoothService
         if (mBluetoothService != null) mBluetoothService.stop();
     }
 
     //======================================================================================
 
     void initUIElements(){
-        currentRPM = 500;
+        mCurrentRPM = 500;
 
         mSetSpeedValue = findViewById(R.id.rpm_edit_text);
-        mSetSpeedValue.setText(String.valueOf(currentRPM));
+        mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
 
         mMotorSpeedSeekbar = findViewById(R.id.motorSpeedSeekBar);
 
@@ -123,10 +115,11 @@ public class MainActivity extends AppCompatActivity {
         mMotorSpeedSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int currentRpmValue = seekBar.getProgress();
+                mCurrentRPM = seekBar.getProgress();
+                sendNewRpmToGrindingMachine();
                 if(!mSetSpeedValue.getText().toString().isEmpty()) {
-                    if (currentRpmValue != Integer.parseInt(mSetSpeedValue.getText().toString())) {
-                        mSetSpeedValue.setText(String.valueOf(currentRpmValue));
+                    if (mCurrentRPM != Integer.parseInt(mSetSpeedValue.getText().toString())) {
+                        mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
                         mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
                     }else {
                         return;
@@ -176,12 +169,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void changeSeekBarValue(){
 
-        int currentRpmValue;
         if(!mSetSpeedValue.getText().toString().isEmpty()) {
-            currentRpmValue = Integer.parseInt(mSetSpeedValue.getText().toString());
-            mMotorSpeedSeekbar.setProgress(currentRpmValue, true);
+            mCurrentRPM = Integer.parseInt(mSetSpeedValue.getText().toString());
+            mMotorSpeedSeekbar.setProgress(mCurrentRPM, true);
         }else{
             mMotorSpeedSeekbar.setProgress(0, true);
+            mCurrentRPM = 0;
         }
     }
 
@@ -287,8 +280,8 @@ public class MainActivity extends AppCompatActivity {
     //======================================================================================
 
     public void sendNewRpmToGrindingMachine(){
-//        String testString = String.valueOf(currentRPM);
-        String testString = "this is a test string";
-        sendMessage(Constants.MESSAGE_START + testString + Constants.MESSAGE_END);
+        String message = String.valueOf(mCurrentRPM);
+//        String testString = "this is a test string";
+        sendMessage(Constants.MESSAGE_START + message + Constants.MESSAGE_END);
     }
 }
