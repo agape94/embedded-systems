@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mSetSpeedValue;
     private int currentRPM;
     private Button mBluetoothToggle;
+    private Button mSetSpeedButton;
 
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -62,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableIntent, Constants.REQUEST_ENABLE_BT);
         } else {
             // Initialize the BluetoothChatService to perform bluetooth connections
-            mBluetoothService = new BluetoothService(this, mHandler);
+            if(mBluetoothService == null) {
+                mBluetoothService = new BluetoothService(this, mHandler);
+            }
         }
     }
 
@@ -125,9 +128,6 @@ public class MainActivity extends AppCompatActivity {
                     if (currentRpmValue != Integer.parseInt(mSetSpeedValue.getText().toString())) {
                         mSetSpeedValue.setText(String.valueOf(currentRpmValue));
                         mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
-
-                        String testString = String.valueOf(currentRpmValue);
-                        sendMessage(testString);
                     }else {
                         return;
                     }
@@ -152,6 +152,14 @@ public class MainActivity extends AppCompatActivity {
                 connect();
             }
         });
+
+        mSetSpeedButton = findViewById(R.id.set_speed_btn);
+        mSetSpeedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendNewRpmToGrindingMachine();
+            }
+        });
     }
 
     //======================================================================================
@@ -172,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
         if(!mSetSpeedValue.getText().toString().isEmpty()) {
             currentRpmValue = Integer.parseInt(mSetSpeedValue.getText().toString());
             mMotorSpeedSeekbar.setProgress(currentRpmValue, true);
-            sendMessage(mSetSpeedValue.getText().toString());
         }else{
             mMotorSpeedSeekbar.setProgress(0, true);
         }
@@ -235,9 +242,6 @@ public class MainActivity extends AppCompatActivity {
             // Get the message bytes and tell the BluetoothService to write
             byte[] send = message.getBytes();
             mBluetoothService.write(send);
-            // Reset out string buffer to zero and clear the edit text field
-//            mOutStringBuffer.setLength(0);
-//            mOutEditText.setText(mOutStringBuffer);
         }
     }
 
@@ -278,5 +282,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void discoverable(View v) {
         ensureDiscoverable();
+    }
+
+    //======================================================================================
+
+    public void sendNewRpmToGrindingMachine(){
+//        String testString = String.valueOf(currentRPM);
+        String testString = "this is a test string";
+        sendMessage(Constants.MESSAGE_START + testString + Constants.MESSAGE_END);
     }
 }
