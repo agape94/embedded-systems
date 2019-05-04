@@ -8,4 +8,13 @@
     <string name="motor_speed">1000 rpm</string>
     <string name="rpm">RPM</string>
     <string name="set_speed">Set speed</string>
+    <string name="bt_not_enabled_leaving">Bluetooth not enabled. Please enable and retry!</string>
+    <string name="none_paired">No device paired!</string>
+    <string name="scanning">Scanning for devices...</string>
+    <string name="select_device">Select a device to connect to.</string>
+    <string name="none_found">No devices found!</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+    <string name="not_connected">You are not connected to a device</string>
 </resources>
