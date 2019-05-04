@@ -16,6 +16,7 @@ public class Constants {
 
     // Key names received from the BluetoothService Handler
     public static final String DEVICE_NAME = "device_name";
+    public static final String DEVICE_ADDRESS = "device_address";
     public static final String TOAST = "toast";
 
     // Intent request codes
@@ -24,4 +25,12 @@ public class Constants {
 
     public static final String MESSAGE_START = "<";
     public static final String MESSAGE_END = ">";
+
+    // Constants for the settings activity
+    public static String SET_SPEED_AUTOMATICALLY_KEY = "set_speed_automatically_preference";
+    public static String MINIMUM_RPM_KEY = "minimum_speed_preference";
+    public static String MAXIMUM_RPM_KEY = "maximum_speed_preference";
+    public static boolean SET_SPEED_AUTOMATICALLY_VALUE;
+    public static int MINIMUM_RPM_VALUE;
+    public static int MAXIMUM_RPM_VALUE;
 }

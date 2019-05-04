@@ -22,9 +22,6 @@ import java.util.UUID;
  */
 public class BluetoothService {
 
-    // Name for the SDP record when creating server socket
-    private static final String NAME = "BluetoothService";
-
     // Member fields
     private final BluetoothAdapter mAdapter;
     private final Handler mHandler;
@@ -226,7 +223,7 @@ public class BluetoothService {
             BluetoothServerSocket tmp = null;
             // Create a new listening server socket
             try {
-                tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME, Constants.BT_UUID);
+                tmp = mAdapter.listenUsingRfcommWithServiceRecord(Constants.APP_NAME, Constants.BT_UUID);
             } catch (IOException e) {
                 e.printStackTrace();
             }
