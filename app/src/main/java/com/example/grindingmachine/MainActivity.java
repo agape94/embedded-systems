@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mBluetoothToggle;
     private Button mSetSpeedButton;
     SharedPreferences mBluetoothSettings;
+    private Menu mMenu;
 
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.top_menu, menu);
+        mMenu = menu;
         return true;
     }
 
@@ -79,8 +81,13 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.settings_item:
                 // User chose the "Settings" item, show the app settings UI...
-                Intent newIntent = new Intent(this, SettingsActivity.class);
-                startActivity(newIntent);
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+
+            case R.id.bluetooth_item:
+                // User chose the "Bluetooth" item, show the app settings UI...
+                connect();
                 return true;
 
             case R.id.help_item:
@@ -201,14 +208,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mBluetoothToggle = findViewById(R.id.bluetooth_toggle);
-        mBluetoothToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connect();
-            }
-        });
-
         mSetSpeedButton = findViewById(R.id.set_speed_btn);
         mSetSpeedButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -279,6 +278,23 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), msg.getData().getString(Constants.TOAST),
                             Toast.LENGTH_SHORT).show();
                     break;
+                case Constants.MESSAGE_STATE_CHANGE:
+                    int bluetoothState = msg.arg1;
+                    if(mMenu != null) {
+                        switch (bluetoothState) {
+                            case BluetoothService.STATE_NONE:
+                                mMenu.findItem(R.id.bluetooth_item).setIcon(R.drawable.ic_bluetooth_disabled_red_24dp);
+                                break;
+                            case BluetoothService.STATE_CONNECTED:
+                                mMenu.findItem(R.id.bluetooth_item).setIcon(R.drawable.ic_bluetooth_connected_white_24dp);
+                                break;
+                            case BluetoothService.STATE_CONNECTING:
+                                mMenu.findItem(R.id.bluetooth_item).setIcon(R.drawable.ic_bluetooth_yellow_24dp);
+                                break;
+                        }
+                    }
+                    break;
+
             }
         }
     };
