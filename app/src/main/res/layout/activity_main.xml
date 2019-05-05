@@ -131,7 +131,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/set_speed_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -139,12 +139,46 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="140dp"
+            android:layout_marginEnd="30dp"
             android:text="@string/set_speed"
             android:textSize="20sp"
-            android:theme="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:textColor="@color/colorButtonText"
+            app:backgroundTint="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/set_speed_text_layout" />
-    </android.support.constraint.ConstraintLayout>
 
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/load_speed_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/set_speed_text_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="30dp"
+            android:text="@string/load"
+            android:textSize="20sp"
+            android:textColor="@color/colorButtonText"
+            app:backgroundTint="@color/colorPrimaryDark"
+            android:theme="@style/Widget.AppCompat.Button.Borderless.Colored"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/set_speed_text_layout" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/save_speed_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/set_speed_text_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="20dp"
+            android:text="@string/save"
+            android:textSize="20sp"
+            android:textColor="@color/colorButtonText"
+            app:backgroundTint="@color/colorPrimary"
+            android:theme="@style/Widget.AppCompat.Button.Borderless.Colored"
+            app:layout_constraintStart_toEndOf="@id/load_speed_btn"
+            app:layout_constraintTop_toBottomOf="@+id/set_speed_text_layout" />
+
+    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

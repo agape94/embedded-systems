@@ -4,13 +4,16 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private int mCurrentRPM;
     private Button mBluetoothToggle;
     private Button mSetSpeedButton;
+    private Button mLoadSpeedProfileButton;
+    private Button mSaveSpeedProfileButton;
     SharedPreferences mBluetoothSettings;
     private Menu mMenu;
 
@@ -80,19 +85,21 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings_item:
-                // User chose the "Settings" item, show the app settings UI...
+                // User chose the "Settings" item
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
+                startActivityForResult(settingsIntent, Constants.START_SETTINGS_REQUEST_CODE);
                 return true;
 
             case R.id.bluetooth_item:
-                // User chose the "Bluetooth" item, show the app settings UI...
+                // User chose the "Bluetooth" item
                 connect();
                 return true;
 
-            case R.id.help_item:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+            case R.id.speed_profiles_item:
+                // User chose the "Speed profiles" action
+                Intent speedProfilesIntent = new Intent(this, SpeedProfilesActivity.class);
+                speedProfilesIntent.putExtra(Constants.SPEED_PROFILES_ACTIVITY_FOR, Constants.EDIT_VIEW_SPEED_PROFILES_REQUEST_CODE);
+                startActivityForResult(speedProfilesIntent, Constants.EDIT_VIEW_SPEED_PROFILES_REQUEST_CODE);
                 return true;
 
             default:
@@ -187,14 +194,9 @@ public class MainActivity extends AppCompatActivity {
                 {
                     sendNewRpmToGrindingMachine();
                 }
-                if(!mSetSpeedValue.getText().toString().isEmpty()) {
-                    if (mCurrentRPM != Integer.parseInt(mSetSpeedValue.getText().toString())) {
-                        mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
-                        mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
-                    }else {
-                        return;
-                    }
-                }
+                mCurrentRPM = mMotorSpeedSeekbar.getProgress();
+                mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
+                mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
             }
 
             @Override
@@ -215,6 +217,24 @@ public class MainActivity extends AppCompatActivity {
                 sendNewRpmToGrindingMachine();
             }
         });
+
+        mLoadSpeedProfileButton = findViewById(R.id.load_speed_btn);
+        mLoadSpeedProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent speedProfilesIntent = new Intent(getApplicationContext(),SpeedProfilesActivity.class);
+                speedProfilesIntent.putExtra(Constants.SPEED_PROFILES_ACTIVITY_FOR, Constants.SELECT_SPEED_PROFILE_REQUEST_CODE);
+                startActivityForResult(speedProfilesIntent,Constants.SELECT_SPEED_PROFILE_REQUEST_CODE);
+            }
+        });
+        mSaveSpeedProfileButton = findViewById(R.id.save_speed_btn);
+        mSaveSpeedProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEditDialog();
+            }
+        });
+
     }
 
     //======================================================================================
@@ -341,8 +361,24 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode != Activity.RESULT_OK) {
                     // User did not enable Bluetooth or an error occured
                     Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
-                    finish();
                 }
+            case Constants.SELECT_SPEED_PROFILE_REQUEST_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    SpeedProfile selectedSpeedProfile = (SpeedProfile) data.getSerializableExtra(Constants.SPEED_PROFILE_SELECT_KEY);
+                    if(selectedSpeedProfile != null)
+                    {
+                        mCurrentRPM = selectedSpeedProfile.getSpeed();
+                        mMotorSpeedSeekbar.setProgress(mCurrentRPM);
+                        mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
+                        Toast.makeText(this, Html.fromHtml(getString(R.string.selected_speed_profile_toast)+" <b>"+ selectedSpeedProfile.getTitle() +"</b>"), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+            case Constants.SAVE_SPEED_PROFILE_REQUEST_CODE:
+                if(resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(this, "Saved succesfully!", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
@@ -364,5 +400,41 @@ public class MainActivity extends AppCompatActivity {
     public void sendNewRpmToGrindingMachine(){
         String message = String.valueOf(mCurrentRPM);
         sendMessage(Constants.MESSAGE_START + message + Constants.MESSAGE_END);
+    }
+
+    //======================================================================================
+
+    private void showEditDialog(){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+
+        View mView = getLayoutInflater().inflate(R.layout.profile_popup_dialog, null);
+        final EditText mTitleTV = (EditText) mView.findViewById(R.id.pop_up_title);
+        final EditText mSpeedTV = (EditText) mView.findViewById(R.id.pop_up_speed);
+        mSpeedTV.setText(String.valueOf(mCurrentRPM));
+        mBuilder.setView(mView);
+        mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (!mTitleTV.getText().toString().isEmpty() && !mSpeedTV.getText().toString().isEmpty()) {
+                    SpeedProfile profile = new SpeedProfile();
+                    profile.setSpeed(Integer.parseInt(mSpeedTV.getText().toString()));
+                    profile.setTitle(mTitleTV.getText().toString());
+                    Intent speedProfilesIntent = new Intent(getApplicationContext(), SpeedProfilesActivity.class);
+                    speedProfilesIntent.putExtra(Constants.SPEED_PROFILES_ACTIVITY_FOR, Constants.SAVE_SPEED_PROFILE_REQUEST_CODE);
+                    speedProfilesIntent.putExtra(Constants.SPEED_PROFILE_SAVE_KEY, profile);
+                    startActivityForResult(speedProfilesIntent, Constants.SAVE_SPEED_PROFILE_REQUEST_CODE);
+                }
+            }
+        });
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
     }
 }

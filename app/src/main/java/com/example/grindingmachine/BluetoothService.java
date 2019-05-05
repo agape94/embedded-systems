@@ -36,6 +36,8 @@ public class BluetoothService {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
+    //======================================================================================
+
     /**
      * Constructor. Prepares a new BluetoothService session.
      *
@@ -48,6 +50,8 @@ public class BluetoothService {
         mHandler = handler;
     }
 
+    //======================================================================================
+
     /**
      * Set the current state of the bluetooth connection
      *
@@ -59,12 +63,16 @@ public class BluetoothService {
         mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
+    //======================================================================================
+
     /**
      * Return the current connection state.
      */
     public synchronized int getState() {
         return mState;
     }
+
+    //======================================================================================
 
     /**
      * Start the bluetooth service. Specifically start AcceptThread to begin a
@@ -89,6 +97,8 @@ public class BluetoothService {
         setState(STATE_LISTEN);
     }
 
+    //======================================================================================
+
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
      *
@@ -112,6 +122,8 @@ public class BluetoothService {
         mConnectThread.start();
         setState(STATE_CONNECTING);
     }
+
+    //======================================================================================
 
     /**
      * Start the ConnectedThread to begin managing a Bluetooth connection
@@ -147,6 +159,8 @@ public class BluetoothService {
         setState(STATE_CONNECTED);
     }
 
+    //======================================================================================
+
     /**
      * Stop all threads
      */
@@ -166,6 +180,8 @@ public class BluetoothService {
         setState(STATE_NONE);
     }
 
+    //======================================================================================
+
     /**
      * Write to the ConnectedThread in an unsynchronized manner
      *
@@ -184,6 +200,8 @@ public class BluetoothService {
         r.write(out);
     }
 
+    //======================================================================================
+
     /**
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
@@ -197,6 +215,8 @@ public class BluetoothService {
         mHandler.sendMessage(msg);
     }
 
+    //======================================================================================
+
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
@@ -209,6 +229,8 @@ public class BluetoothService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
     }
+
+    //======================================================================================
 
     /**
      * This thread runs while listening for incoming connections. It behaves
@@ -276,6 +298,8 @@ public class BluetoothService {
         }
     }
 
+    //======================================================================================
+
     /**
      * This thread runs while attempting to make an outgoing connection
      * with a device. It runs straight through; the connection either
@@ -336,6 +360,8 @@ public class BluetoothService {
             }
         }
     }
+
+    //======================================================================================
 
     /**
      * This thread runs during a connection with a remote device.
@@ -404,4 +430,6 @@ public class BluetoothService {
             }
         }
     }
+    //======================================================================================
+
 }
