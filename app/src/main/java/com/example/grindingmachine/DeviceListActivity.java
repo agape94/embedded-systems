@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -35,6 +36,8 @@ public class DeviceListActivity extends AppCompatActivity {
     private BluetoothAdapter mBtAdapter;
     private ArrayAdapter<String> mPairedDevicesArrayAdapter;
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
+
+    //======================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,8 @@ public class DeviceListActivity extends AppCompatActivity {
         }
     }
 
+    //======================================================================================
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -96,6 +101,8 @@ public class DeviceListActivity extends AppCompatActivity {
         // Unregister broadcast listeners
         this.unregisterReceiver(mReceiver);
     }
+
+    //======================================================================================
 
     /**
      * Start device discover with the BluetoothAdapter
@@ -114,6 +121,8 @@ public class DeviceListActivity extends AppCompatActivity {
         mBtAdapter.startDiscovery();
     }
 
+    //======================================================================================
+
     // The on-click listener for all devices in the ListViews
     private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
@@ -130,6 +139,8 @@ public class DeviceListActivity extends AppCompatActivity {
             finish();
         }
     };
+
+    //======================================================================================
 
     // The BroadcastReceiver that listens for discovered devices and
     // changes the title when discovery is finished
@@ -155,4 +166,17 @@ public class DeviceListActivity extends AppCompatActivity {
             }
         }
     };
+
+    //======================================================================================
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home){
+            setResult(Activity.RESULT_CANCELED);
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

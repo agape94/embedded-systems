@@ -3,7 +3,6 @@ package com.example.grindingmachine;
 import java.util.UUID;
 
 public class Constants {
-    public static final String GRINDING_MACHINE_BT_NAME = "GRINDING";
     public static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     public static final String APP_NAME = "Grinding app";
     public static final String SPEED_PROFILES_SHARED_PREF_KEY = "speed_profiles";
@@ -35,4 +34,18 @@ public class Constants {
     public static boolean SET_SPEED_AUTOMATICALLY_VALUE;
     public static int MINIMUM_RPM_VALUE;
     public static int MAXIMUM_RPM_VALUE;
+
+    public enum EditOptions{
+        NEW_SPEED_PROFILE,
+        EDIT_SPEED_PROFILE,
+        DELETE_SPEED_PROFILE;
+    }
+
+    public static final int SELECT_SPEED_PROFILE_REQUEST_CODE = 5;
+    public static final int SAVE_SPEED_PROFILE_REQUEST_CODE = 8;
+    public static final int START_SETTINGS_REQUEST_CODE = 7;
+    public static final int EDIT_VIEW_SPEED_PROFILES_REQUEST_CODE = 6;
+    public static final String SPEED_PROFILES_ACTIVITY_FOR = "start_speed_profiles_for";
+    public static final String SPEED_PROFILE_SELECT_KEY = "load_speed_profile";
+    public static final String SPEED_PROFILE_SAVE_KEY = "save_speed_profile";
 }

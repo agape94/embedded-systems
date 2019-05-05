@@ -1,6 +1,8 @@
 package com.example.grindingmachine;
 
-public class SpeedProfile {
+import java.io.Serializable;
+
+public class SpeedProfile implements Serializable {
     private String mTitle;
     private int mSpeed;
 
