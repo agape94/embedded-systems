@@ -28,4 +28,5 @@
     <string name="minimum_rpm_pref_title">Minimum RPM</string>
     <string name="maximum_speed_pref_summary">Maximum value for the rpm of the motor when in operation.</string>
     <string name="maximum_speed_pref_title">Maximum RPM</string>
+    <string name="title_activity_speed_profiles">SpeedProfilesActivity</string>
 </resources>

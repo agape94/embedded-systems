@@ -80,19 +80,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings_item:
-                // User chose the "Settings" item, show the app settings UI...
+                // User chose the "Settings" item
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
 
             case R.id.bluetooth_item:
-                // User chose the "Bluetooth" item, show the app settings UI...
+                // User chose the "Bluetooth" item
                 connect();
                 return true;
 
-            case R.id.help_item:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+            case R.id.speed_profiles_item:
+                // User chose the "Speed profiles" action
+                Intent speedProfilesIntent = new Intent(this, SpeedProfilesActivity.class);
+                startActivity(speedProfilesIntent);
                 return true;
 
             default:

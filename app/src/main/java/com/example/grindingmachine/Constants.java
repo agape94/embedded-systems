@@ -6,6 +6,8 @@ public class Constants {
     public static final String GRINDING_MACHINE_BT_NAME = "GRINDING";
     public static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     public static final String APP_NAME = "Grinding app";
+    public static final String SPEED_PROFILES_SHARED_PREF_KEY = "speed_profiles";
+    public static final String SPEED_PROFILES_SHARED_PREF_NAME = "speed_profiles_shared_prefs";
 
     // Message types sent from the BluetoothChatService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
