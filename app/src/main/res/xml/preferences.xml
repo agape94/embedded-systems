@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreference
+        android:defaultValue="true"
+        app:iconSpaceReserved="false"
+        android:key="set_speed_automatically_preference"
+        android:summary="@string/set_speed_automatically_summary"
+        android:title="@string/set_speed_automatically_title" />
+    <EditTextPreference
+        android:defaultValue="0"
+        android:key="minimum_speed_preference"
+        app:iconSpaceReserved="false"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/minimum_speed_pref_summary"
+        android:title="@string/minimum_rpm_pref_title" />
+    <EditTextPreference
+        android:defaultValue="999"
+        android:key="maximum_speed_preference"
+        app:iconSpaceReserved="false"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/maximum_speed_pref_summary"
+        android:title="@string/maximum_speed_pref_title" />
+</PreferenceScreen>

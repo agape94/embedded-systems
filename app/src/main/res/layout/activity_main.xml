@@ -18,45 +18,14 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RelativeLayout
-            android:id="@+id/connection_status_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/battery_charge_layout"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/connection_status_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="30dp"
-                android:text="@string/connected_status"
-                android:textColor="@android:color/holo_green_dark"
-                android:textSize="25sp" />
-
-            <Button
-                android:id="@+id/bluetooth_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="30dp"
-                android:text="@string/button_disconnect"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="20sp"
-                android:theme="@style/Widget.AppCompat.Button.Borderless.Colored" />
-        </RelativeLayout>
-
-        <RelativeLayout
             android:id="@+id/battery_charge_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
+
             app:layout_constraintBottom_toTopOf="@+id/current_speed_layout"
-            app:layout_constraintTop_toBottomOf="@+id/connection_status_layout">
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -121,8 +90,8 @@
                 android:id="@+id/motorSpeedSeekBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="10dp" />
+                android:layout_margin="10dp"
+                android:layout_weight="1" />
         </LinearLayout>
 
         <android.support.constraint.ConstraintLayout
@@ -163,8 +132,8 @@
         </android.support.constraint.ConstraintLayout>
 
         <Button
-            android:layout_width="wrap_content"
             android:id="@+id/set_speed_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/set_speed_text_layout"
             android:layout_centerHorizontal="true"

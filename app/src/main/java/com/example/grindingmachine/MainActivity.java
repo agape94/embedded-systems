@@ -5,12 +5,17 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private int mCurrentRPM;
     private Button mBluetoothToggle;
     private Button mSetSpeedButton;
+    SharedPreferences mBluetoothSettings;
+    private Menu mMenu;
 
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -40,9 +47,60 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothSettings = getSharedPreferences(Constants.APP_NAME,MODE_PRIVATE);
+
+        android.support.v7.preference.PreferenceManager
+                .setDefaultValues(this, R.xml.preferences, false);
+
+        SharedPreferences settingsSharedPref = android.support.v7.preference.PreferenceManager
+                        .getDefaultSharedPreferences(this);
+
+        Constants.MAXIMUM_RPM_VALUE = Integer.parseInt(settingsSharedPref.getString(Constants.MAXIMUM_RPM_KEY, "999"));
+        Constants.MINIMUM_RPM_VALUE = Integer.parseInt(settingsSharedPref.getString(Constants.MINIMUM_RPM_KEY, "0"));
+        Constants.SET_SPEED_AUTOMATICALLY_VALUE = settingsSharedPref.getBoolean(Constants.SET_SPEED_AUTOMATICALLY_KEY, true);
 
         initUIElements();
         toastIfBTNotAvailable();
+
+    }
+
+    //======================================================================================
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.top_menu, menu);
+        mMenu = menu;
+        return true;
+    }
+
+    //======================================================================================
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.settings_item:
+                // User chose the "Settings" item, show the app settings UI...
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+
+            case R.id.bluetooth_item:
+                // User chose the "Bluetooth" item, show the app settings UI...
+                connect();
+                return true;
+
+            case R.id.help_item:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     //======================================================================================
@@ -57,6 +115,14 @@ public class MainActivity extends AppCompatActivity {
             // Initialize the BluetoothService to perform bluetooth connections
             if(mBluetoothService == null) {
                 mBluetoothService = new BluetoothService(this, mHandler);
+                if(mBluetoothSettings.contains(Constants.DEVICE_ADDRESS))
+                {
+                    String deviceAddress = mBluetoothSettings.getString(Constants.DEVICE_ADDRESS, "");
+                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
+                    // Attempt to connect to the device
+                    mBluetoothService.connect(device);
+                    Log.d("onStart", "Connected automatically to " + deviceAddress);
+                }
             }
         }
     }
@@ -89,15 +155,16 @@ public class MainActivity extends AppCompatActivity {
     //======================================================================================
 
     void initUIElements(){
-        mCurrentRPM = 500;
+        mCurrentRPM = Constants.MINIMUM_RPM_VALUE;
 
         mSetSpeedValue = findViewById(R.id.rpm_edit_text);
         mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
 
         mMotorSpeedSeekbar = findViewById(R.id.motorSpeedSeekBar);
+        mMotorSpeedSeekbar.setProgress(mCurrentRPM);
 
-        mMotorSpeedSeekbar.setMin(0);
-        mMotorSpeedSeekbar.setMax(999); //TODO Set to configurable value. Motor specific value
+        mMotorSpeedSeekbar.setMin(Constants.MINIMUM_RPM_VALUE);
+        mMotorSpeedSeekbar.setMax(Constants.MAXIMUM_RPM_VALUE);
 
         mSetSpeedValue.addTextChangedListener(new TextWatcher() {
             @Override
@@ -116,7 +183,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mCurrentRPM = seekBar.getProgress();
-                sendNewRpmToGrindingMachine();
+                if(Constants.SET_SPEED_AUTOMATICALLY_VALUE)
+                {
+                    sendNewRpmToGrindingMachine();
+                }
                 if(!mSetSpeedValue.getText().toString().isEmpty()) {
                     if (mCurrentRPM != Integer.parseInt(mSetSpeedValue.getText().toString())) {
                         mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
@@ -138,14 +208,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mBluetoothToggle = findViewById(R.id.bluetooth_toggle);
-        mBluetoothToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connect();
-            }
-        });
-
         mSetSpeedButton = findViewById(R.id.set_speed_btn);
         mSetSpeedButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
         // If the adapter is null, then Bluetooth is not supported
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-//            finish();
         }
     }
 
@@ -217,6 +278,23 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), msg.getData().getString(Constants.TOAST),
                             Toast.LENGTH_SHORT).show();
                     break;
+                case Constants.MESSAGE_STATE_CHANGE:
+                    int bluetoothState = msg.arg1;
+                    if(mMenu != null) {
+                        switch (bluetoothState) {
+                            case BluetoothService.STATE_NONE:
+                                mMenu.findItem(R.id.bluetooth_item).setIcon(R.drawable.ic_bluetooth_disabled_red_24dp);
+                                break;
+                            case BluetoothService.STATE_CONNECTED:
+                                mMenu.findItem(R.id.bluetooth_item).setIcon(R.drawable.ic_bluetooth_connected_white_24dp);
+                                break;
+                            case BluetoothService.STATE_CONNECTING:
+                                mMenu.findItem(R.id.bluetooth_item).setIcon(R.drawable.ic_bluetooth_yellow_24dp);
+                                break;
+                        }
+                    }
+                    break;
+
             }
         }
     };
@@ -247,11 +325,15 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     // Get the device MAC address
                     String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    // Get the BLuetoothDevice object
+                    // Get the BluetoothDevice object
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
                     // Attempt to connect to the device
                     mBluetoothService.connect(device);
 
+                    // Writing the device address to shared prefs, so next time it will connect automatically
+                    SharedPreferences.Editor editor = mBluetoothSettings.edit();
+                    editor.putString(Constants.DEVICE_ADDRESS, address);
+                    editor.commit();
                 }
                 break;
             case Constants.REQUEST_ENABLE_BT:
@@ -281,7 +363,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendNewRpmToGrindingMachine(){
         String message = String.valueOf(mCurrentRPM);
-//        String testString = "this is a test string";
         sendMessage(Constants.MESSAGE_START + message + Constants.MESSAGE_END);
     }
 }
