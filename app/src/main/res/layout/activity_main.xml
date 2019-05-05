@@ -90,7 +90,11 @@
                 android:id="@+id/motorSpeedSeekBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="15dp"
+                android:progress="@android:integer/config_shortAnimTime"
+                android:progressDrawable="@drawable/seekbar_style"
+                android:splitTrack="false"
+                android:thumb="@drawable/custom_thumb"
                 android:layout_weight="1" />
         </LinearLayout>
 

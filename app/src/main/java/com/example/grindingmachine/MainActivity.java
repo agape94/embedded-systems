@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mSaveSpeedProfileButton;
     SharedPreferences mBluetoothSettings;
     private Menu mMenu;
+    private boolean mSeekbarMoved = false;
 
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -54,16 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothSettings = getSharedPreferences(Constants.APP_NAME,MODE_PRIVATE);
 
-        android.support.v7.preference.PreferenceManager
-                .setDefaultValues(this, R.xml.preferences, false);
-
-        SharedPreferences settingsSharedPref = android.support.v7.preference.PreferenceManager
-                        .getDefaultSharedPreferences(this);
-
-        Constants.MAXIMUM_RPM_VALUE = Integer.parseInt(settingsSharedPref.getString(Constants.MAXIMUM_RPM_KEY, "999"));
-        Constants.MINIMUM_RPM_VALUE = Integer.parseInt(settingsSharedPref.getString(Constants.MINIMUM_RPM_KEY, "0"));
-        Constants.SET_SPEED_AUTOMATICALLY_VALUE = settingsSharedPref.getBoolean(Constants.SET_SPEED_AUTOMATICALLY_KEY, true);
-
+        loadSettings();
         initUIElements();
         toastIfBTNotAvailable();
 
@@ -168,10 +162,11 @@ public class MainActivity extends AppCompatActivity {
         mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
 
         mMotorSpeedSeekbar = findViewById(R.id.motorSpeedSeekBar);
+        if(mMotorSpeedSeekbar.getMax() != Constants.MAXIMUM_RPM_VALUE)
+        {
+            mMotorSpeedSeekbar.setMax(Constants.MAXIMUM_RPM_VALUE);
+        }
         mMotorSpeedSeekbar.setProgress(mCurrentRPM);
-
-        mMotorSpeedSeekbar.setMin(Constants.MINIMUM_RPM_VALUE);
-        mMotorSpeedSeekbar.setMax(Constants.MAXIMUM_RPM_VALUE);
 
         mSetSpeedValue.addTextChangedListener(new TextWatcher() {
             @Override
@@ -179,34 +174,36 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                changeSeekBarValue();
+
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+                rpmValueChanged();
+            }
         });
 
         mMotorSpeedSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mCurrentRPM = seekBar.getProgress();
-                if(Constants.SET_SPEED_AUTOMATICALLY_VALUE)
-                {
-                    sendNewRpmToGrindingMachine();
+                if(mSeekbarMoved) {
+                    mCurrentRPM = Constants.MINIMUM_RPM_VALUE + progress;
+                    mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
+                    mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
+                    if (Constants.SET_SPEED_AUTOMATICALLY_VALUE) {
+                        sendNewRpmToGrindingMachine();
+                    }
                 }
-                mCurrentRPM = mMotorSpeedSeekbar.getProgress();
-                mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
-                mSetSpeedValue.setSelection(mSetSpeedValue.getText().toString().length());
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                mSeekbarMoved = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                mSeekbarMoved = false;
             }
         });
 
@@ -248,13 +245,24 @@ public class MainActivity extends AppCompatActivity {
 
     //======================================================================================
 
-    private void changeSeekBarValue(){
+    private void rpmValueChanged(){
 
         if(!mSetSpeedValue.getText().toString().isEmpty()) {
-            mCurrentRPM = Integer.parseInt(mSetSpeedValue.getText().toString());
-            mMotorSpeedSeekbar.setProgress(mCurrentRPM, true);
+            int inputedValue = 0;
+            inputedValue = Integer.parseInt(mSetSpeedValue.getText().toString());
+            if(inputedValue >= Constants.MINIMUM_RPM_VALUE && inputedValue <= Constants.MAXIMUM_RPM_VALUE) {
+                mCurrentRPM = inputedValue;
+                if(!mSeekbarMoved) {
+                    mMotorSpeedSeekbar.setProgress(mCurrentRPM, true);
+                }
+            }else{
+                mSetSpeedValue.setError("The RPM value should be between " + Constants.MINIMUM_RPM_VALUE
+                + " and " + Constants.MAXIMUM_RPM_VALUE);
+            }
         }else{
-            mMotorSpeedSeekbar.setProgress(0, true);
+            if(!mSeekbarMoved) {
+                mMotorSpeedSeekbar.setProgress(Constants.MINIMUM_RPM_VALUE, true);
+            }
             mCurrentRPM = 0;
         }
     }
@@ -379,6 +387,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Saved succesfully!", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case Constants.START_SETTINGS_REQUEST_CODE:
+                if(resultCode == RESULT_OK){
+                    loadSettings();
+                }
+                break;
         }
     }
 
@@ -435,6 +448,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final AlertDialog dialog = mBuilder.create();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
     }
+
+    //======================================================================================
+
+    private void loadSettings(){
+        android.support.v7.preference.PreferenceManager
+                .setDefaultValues(this, R.xml.preferences, false);
+
+        SharedPreferences settingsSharedPref = android.support.v7.preference.PreferenceManager
+                .getDefaultSharedPreferences(this);
+
+        Constants.MAXIMUM_RPM_VALUE = Integer.parseInt(settingsSharedPref.getString(Constants.MAXIMUM_RPM_KEY, "999"));
+        Constants.MINIMUM_RPM_VALUE = Integer.parseInt(settingsSharedPref.getString(Constants.MINIMUM_RPM_KEY, "0"));
+        Constants.SET_SPEED_AUTOMATICALLY_VALUE = settingsSharedPref.getBoolean(Constants.SET_SPEED_AUTOMATICALLY_KEY, true);
+
+        if (Constants.MINIMUM_RPM_VALUE >= Constants.MAXIMUM_RPM_VALUE)
+        {
+            Toast.makeText(this, "Wrong values for RPM limits. Minimum value should be less" +
+                    " than Maximum value. Using default values of 0 and 999 respectively.", Toast.LENGTH_SHORT);
+            Constants.MINIMUM_RPM_VALUE = 0;
+            Constants.MAXIMUM_RPM_VALUE = 999;
+
+        }
+        if(mMotorSpeedSeekbar != null){
+            mMotorSpeedSeekbar.setMax(Constants.MAXIMUM_RPM_VALUE);
+        }
+    }
+
 }
