@@ -9,11 +9,11 @@ public class Constants {
     public static final String SPEED_PROFILES_SHARED_PREF_NAME = "speed_profiles_shared_prefs";
 
     // Message types sent from the BluetoothChatService Handler
-    public static final int MESSAGE_STATE_CHANGE = 1;
-    public static final int MESSAGE_READ = 2;
-    public static final int MESSAGE_WRITE = 3;
-    public static final int MESSAGE_DEVICE_NAME = 4;
-    public static final int MESSAGE_TOAST = 5;
+    public static final int MESSAGE_STATE_CHANGE = 3;
+    public static final int MESSAGE_READ = 4;
+    public static final int MESSAGE_WRITE = 5;
+    public static final int MESSAGE_DEVICE_NAME = 6;
+    public static final int MESSAGE_TOAST = 7;
 
     // Key names received from the BluetoothService Handler
     public static final String DEVICE_NAME = "device_name";
@@ -41,10 +41,10 @@ public class Constants {
         DELETE_SPEED_PROFILE;
     }
 
-    public static final int SELECT_SPEED_PROFILE_REQUEST_CODE = 5;
-    public static final int SAVE_SPEED_PROFILE_REQUEST_CODE = 8;
-    public static final int START_SETTINGS_REQUEST_CODE = 7;
-    public static final int EDIT_VIEW_SPEED_PROFILES_REQUEST_CODE = 6;
+    public static final int SELECT_SPEED_PROFILE_REQUEST_CODE = 8;
+    public static final int SAVE_SPEED_PROFILE_REQUEST_CODE = 9;
+    public static final int START_SETTINGS_REQUEST_CODE = 10;
+    public static final int EDIT_VIEW_SPEED_PROFILES_REQUEST_CODE = 11;
     public static final String SPEED_PROFILES_ACTIVITY_FOR = "start_speed_profiles_for";
     public static final String SPEED_PROFILE_SELECT_KEY = "load_speed_profile";
     public static final String SPEED_PROFILE_SAVE_KEY = "save_speed_profile";

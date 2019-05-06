@@ -12,6 +12,7 @@
         android:key="minimum_speed_preference"
         app:iconSpaceReserved="false"
         android:selectAllOnFocus="true"
+        android:inputType="number"
         android:singleLine="true"
         android:summary="@string/minimum_speed_pref_summary"
         android:title="@string/minimum_rpm_pref_title" />
@@ -19,6 +20,7 @@
         android:defaultValue="999"
         android:key="maximum_speed_preference"
         app:iconSpaceReserved="false"
+        android:inputType="number"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:summary="@string/maximum_speed_pref_summary"

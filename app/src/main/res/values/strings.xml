@@ -32,4 +32,6 @@
     <string name="load">Load</string>
     <string name="selected_speed_profile_toast">Selected speed profile </string>
     <string name="save">Save</string>
+    <string name="_500">500</string>
+    <string name="bt_activated">Bluetooth activated!</string>
 </resources>
