@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         mSetSpeedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendNewRpmToGrindingMachine();
+                    sendNewRpmToGrindingMachine();
             }
         });
 
@@ -340,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check that we're actually connected before trying anything
         if (mBluetoothService.getState() != BluetoothService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
         // Check that there's actually something to send
@@ -421,8 +421,10 @@ public class MainActivity extends AppCompatActivity {
     //======================================================================================
 
     public void sendNewRpmToGrindingMachine(){
-        String message = String.valueOf(mCurrentRPM);
-        sendMessage(Constants.MESSAGE_START + message + Constants.MESSAGE_END);
+        if(mBluetoothAdapter.isEnabled()) {
+            String message = String.valueOf(mCurrentRPM);
+            sendMessage(Constants.MESSAGE_START + message + Constants.MESSAGE_END);
+        }
     }
 
     //======================================================================================
