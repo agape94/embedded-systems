@@ -7,7 +7,7 @@ SoftwareSerial BTSerial(D3,D2); // RX: port D2, TX port D3
 byte MESSAGE_START = 0x3C;
 byte MESSAGE_END = 0x3E;
 
-const byte numBytes = 32;
+const byte numBytes = 64;
 byte receivedBytesFromBT[numBytes];
 byte receivedBytesFromSerial[numBytes];
 byte numReceivedFromBT = 0;
@@ -34,6 +34,8 @@ void loop() {
     
     recvFromSerialMonitorWithStartEndMarkers();
     sendReceivedDataFromSerialMonitor();
+
+    //sendBatteryInformation();
 }
 
 //====================================================================================================================
@@ -131,5 +133,29 @@ void sendReceivedDataFromSerialMonitor(){
         Serial.println();
         newDataFromSerial = false;
     }
-  
 }
+
+//====================================================================================================================
+//
+//void sendMessage(byte[] message, int messageType){
+//  switch(messageType){
+//    case 1:
+//      break;
+//    default:
+//      break;l
+//  }
+//}
+
+//====================================================================================================================
+//
+//bool addStartEndMarkers(char[] message){
+//  char* messageWithMarkers;
+//  if(strlen(message) + 3 >= numBytes){
+//    return false;
+//  }else{
+//    messageWithMarkers = new char[strlen(message) + 3];
+//    strcpy(messageWithMarkers, (char)MESSAGE_START);
+//    strcat(messageWithMarkers, message);
+//    strcpy(messageWithMarkers, (char)MESSAGE_END);
+//  }
+//}
