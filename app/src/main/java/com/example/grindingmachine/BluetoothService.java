@@ -395,9 +395,34 @@ public class BluetoothService {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
+                    boolean newDataFromBT = false;
+                    boolean recvFromBTInProgress = false;
+                    byte ndx = 0;
+                    byte rc;
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+                    while (mmInStream.available() > 0 && newDataFromBT == false) {
+                        rc = (byte) mmInStream.read();
+
+                        if (recvFromBTInProgress == true) {
+                            if (rc != Constants.MESSAGE_END) {
+                                buffer[ndx] = rc;
+                                ndx++;
+                            }
+                            else {
+                                buffer[ndx] = '\0'; // terminate the string
+                                recvFromBTInProgress = false;
+                                ndx = 0;
+                                newDataFromBT = true;
+                                mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                                        .sendToTarget();
+                            }
+                        }
+
+                        else if (rc == Constants.MESSAGE_START) {
+                            recvFromBTInProgress = true;
+                        }
+                    }
+
                 } catch (IOException e) {
                     connectionLost();
                     e.printStackTrace();

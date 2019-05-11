@@ -24,8 +24,8 @@ public class Constants {
     public static final int REQUEST_CONNECT_DEVICE = 1;
     public static final int REQUEST_ENABLE_BT = 2;
 
-    public static final String MESSAGE_START = "<";
-    public static final String MESSAGE_END = ">";
+    public static final char MESSAGE_START = '<';
+    public static final char MESSAGE_END = '>';
 
     // Constants for the settings activity
     public static String SET_SPEED_AUTOMATICALLY_KEY = "set_speed_automatically_preference";

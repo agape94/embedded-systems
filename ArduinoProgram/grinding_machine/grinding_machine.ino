@@ -7,14 +7,14 @@ SoftwareSerial BTSerial(D3,D2); // RX: port D2, TX port D3
 byte MESSAGE_START = 0x3C;
 byte MESSAGE_END = 0x3E;
 
-//const byte numChars = 32;
-//char receivedChars[numChars];
-
 const byte numBytes = 32;
-byte receivedBytes[numBytes];
-byte numReceived = 0;
+byte receivedBytesFromBT[numBytes];
+byte receivedBytesFromSerial[numBytes];
+byte numReceivedFromBT = 0;
+byte numReceivedFromSerial = 0;
 
-boolean newData = false;
+boolean newDataFromBT = false;
+boolean newDataFromSerial = false;
 
 //====================================================================================================================
 
@@ -29,58 +29,107 @@ void setup() {
 //====================================================================================================================
 
 void loop() {
-    recvWithStartEndMarkers();
-    showNewData();
+    recvFromBTWithStartEndMarkers();
+    showReceivedDataFromBT();
+    
+    //recvFromSerialMonitorWithStartEndMarkers();
+    //sendReceivedDataFromSerialMonitor();
 }
 
 //====================================================================================================================
 
-void recvWithStartEndMarkers() {
-    static boolean recvInProgress = false;
+void recvFromBTWithStartEndMarkers() {
+    static boolean recvFromBTInProgress = false;
     static byte ndx = 0;
     byte rc;
  
-    while (BTSerial.available() > 0 && newData == false) {
+    while (BTSerial.available() > 0 && newDataFromBT == false) {
         rc = BTSerial.read();
 
-        if (recvInProgress == true) {
+        if (recvFromBTInProgress == true) {
             if (rc != MESSAGE_END) {
-                receivedBytes[ndx] = rc;
+                receivedBytesFromBT[ndx] = rc;
                 ndx++;
                 if (ndx >= numBytes) {
                     ndx = numBytes - 1;
                 }
             }
             else {
-                receivedBytes[ndx] = '\0'; // terminate the string
-                recvInProgress = false;
-                numReceived = ndx;  // save the number for use when printing
+                receivedBytesFromBT[ndx] = '\0'; // terminate the string
+                recvFromBTInProgress = false;
+                numReceivedFromBT = ndx;  // save the number for use when printing
                 ndx = 0;
-                newData = true;
+                newDataFromBT = true;
             }
         }
 
         else if (rc == MESSAGE_START) {
-            recvInProgress = true;
+            recvFromBTInProgress = true;
         }
     }
 }
 
 //====================================================================================================================
 
-void showNewData() {
-    if (newData == true) {
-//        Serial.print("This just in (HEX values)... ");
-        for (byte n = 0; n < numReceived; n++) {
-//            Serial.print(receivedBytes[n], HEX);
-            Serial.write(receivedBytes[n]);
-//            Serial.print(' ');
+void showReceivedDataFromBT() {
+    if (newDataFromBT == true) {
+        for (byte n = 0; n < numReceivedFromBT; n++) {
+            Serial.write(receivedBytesFromBT[n]);
         }
-//        char theReceivedString[numReceived];
         Serial.println();
-        newData = false;
+        newDataFromBT = false;
     }
 
 }
 
 //====================================================================================================================
+
+void recvFromSerialMonitorWithStartEndMarkers(){
+    static boolean recvFromSerialInProgress = false;
+    static byte ndxSerial = 0;
+    byte rc;
+ 
+    while (Serial.available() > 0 && newDataFromSerial == false) {
+        rc = Serial.read();
+
+        if (recvFromSerialInProgress == true) {
+            if (rc != MESSAGE_END) {
+                receivedBytesFromSerial[ndxSerial] = rc;
+                ndxSerial++;
+                if (ndxSerial >= numBytes) {
+                    ndxSerial = numBytes - 1;
+                }
+            }
+            else {
+                receivedBytesFromSerial[ndxSerial] = rc;
+                ndxSerial++;
+                receivedBytesFromSerial[ndxSerial] = '\0'; // terminate the string
+                recvFromSerialInProgress = false;
+                numReceivedFromSerial = ndxSerial;  // save the number for use when printing
+                ndxSerial = 0;
+                newDataFromSerial = true;
+            }
+        }
+        else if (rc == MESSAGE_START) {
+            recvFromSerialInProgress = true;
+            receivedBytesFromSerial[ndxSerial] = rc;
+            ndxSerial++;
+        }
+    }
+  
+}
+
+//====================================================================================================================
+
+void sendReceivedDataFromSerialMonitor(){
+    if (newDataFromSerial == true) {
+        for (byte n = 0; n < numReceivedFromSerial; n++) {
+            //BTSerial.write(receivedBytesFromSerial[n]);
+            Serial.write(receivedBytesFromSerial[n]);
+        }
+        BTSerial.write(receivedBytesFromSerial, numReceivedFromSerial);
+        Serial.println();
+        newDataFromSerial = false;
+    }
+  
+}

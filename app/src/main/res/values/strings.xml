@@ -34,4 +34,6 @@
     <string name="save">Save</string>
     <string name="_500">500</string>
     <string name="bt_activated">Bluetooth activated!</string>
+    <string name="new_speed_profile">New speed profile</string>
+    <string name="edit_speed_profile">Edit speed profile</string>
 </resources>

@@ -4,8 +4,9 @@
     android:layout_height="wrap_content">
     <TextView
         android:layout_width="match_parent"
+        android:id="@+id/popup_dialog_title"
         android:layout_height="64dp"
-        android:text="New speed profile"
+        android:text="@string/new_speed_profile"
         android:textAlignment="center"
         android:textColor="@color/colorButtonText"
         android:textStyle="bold"

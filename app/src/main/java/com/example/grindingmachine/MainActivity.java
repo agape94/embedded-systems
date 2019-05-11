@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences mBluetoothSettings;
     private Menu mMenu;
     private boolean mSeekbarMoved = false;
+    private String mCurrentMessage;
 
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;

@@ -11,11 +11,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -129,33 +132,43 @@ public class SpeedProfilesActivity extends AppCompatActivity {
 
         if(option != Constants.EditOptions.DELETE_SPEED_PROFILE) {
             View mView = getLayoutInflater().inflate(R.layout.profile_popup_dialog, null);
-            final EditText mTitleTV = (EditText) mView.findViewById(R.id.pop_up_title);
-            final EditText mSpeedTV = (EditText) mView.findViewById(R.id.pop_up_speed);
-            mTitleTV.setText(sp.getTitle());
-            mSpeedTV.setText(String.valueOf(sp.getSpeed()));
+            final EditText mTitleEditText = (EditText) mView.findViewById(R.id.pop_up_title);
+            final EditText mSpeedEditText = (EditText) mView.findViewById(R.id.pop_up_speed);
+            TextView mDialogTitle = (TextView) mView.findViewById(R.id.popup_dialog_title);
+            switch (option) {
+                case NEW_SPEED_PROFILE:
+                    mDialogTitle.setText(R.string.new_speed_profile);
+                    break;
+                case EDIT_SPEED_PROFILE:
+                    mDialogTitle.setText(R.string.edit_speed_profile);
+                    break;
+                default:
+                    break;
+            }
+            mTitleEditText.setText(sp.getTitle());
+            mSpeedEditText.setText(String.valueOf(sp.getSpeed()));
             mBuilder.setView(mView);
             mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    int innerIndex = 0;
-                    switch (option) {
-                        case NEW_SPEED_PROFILE:
-                            innerIndex = mSpeedProfiles.size();
-                            break;
-                        case EDIT_SPEED_PROFILE:
-                            innerIndex = idx;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (!mTitleTV.getText().toString().isEmpty() && !mSpeedTV.getText().toString().isEmpty()) {
+                    if (!mTitleEditText.getText().toString().isEmpty() && !mSpeedEditText.getText().toString().isEmpty()) {
                         SpeedProfile profile = new SpeedProfile();
-                        profile.setSpeed(Integer.parseInt(mSpeedTV.getText().toString()));
-                        profile.setTitle(mTitleTV.getText().toString());
-                        mSpeedProfiles.add(innerIndex, profile);
+                        profile.setSpeed(Integer.parseInt(mSpeedEditText.getText().toString()));
+                        profile.setTitle(mTitleEditText.getText().toString());
+                        switch (option) {
+                            case NEW_SPEED_PROFILE:
+                                mSpeedProfiles.add(profile);
+                                break;
+                            case EDIT_SPEED_PROFILE:
+                                mSpeedProfiles.set(idx, profile);
+                                break;
+                            default:
+                                break;
+                        }
                         mAdapter.notifyDataSetChanged();
                         saveData();
                     }
+
                 }
             });
 
