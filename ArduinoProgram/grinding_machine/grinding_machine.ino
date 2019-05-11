@@ -32,8 +32,8 @@ void loop() {
     recvFromBTWithStartEndMarkers();
     showReceivedDataFromBT();
     
-    //recvFromSerialMonitorWithStartEndMarkers();
-    //sendReceivedDataFromSerialMonitor();
+    recvFromSerialMonitorWithStartEndMarkers();
+    sendReceivedDataFromSerialMonitor();
 }
 
 //====================================================================================================================
@@ -124,10 +124,10 @@ void recvFromSerialMonitorWithStartEndMarkers(){
 void sendReceivedDataFromSerialMonitor(){
     if (newDataFromSerial == true) {
         for (byte n = 0; n < numReceivedFromSerial; n++) {
-            //BTSerial.write(receivedBytesFromSerial[n]);
+            BTSerial.write(receivedBytesFromSerial[n]);
             Serial.write(receivedBytesFromSerial[n]);
         }
-        BTSerial.write(receivedBytesFromSerial, numReceivedFromSerial);
+        //BTSerial.write(receivedBytesFromSerial, numReceivedFromSerial);
         Serial.println();
         newDataFromSerial = false;
     }

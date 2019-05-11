@@ -8,10 +8,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -372,6 +376,8 @@ public class BluetoothService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
+        private final BufferedReader mmBufferedReader;
+
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
@@ -384,43 +390,43 @@ public class BluetoothService {
                 e.printStackTrace();
             }
             mmInStream = tmpIn;
+            mmBufferedReader =  new BufferedReader(new InputStreamReader(mmInStream));
             mmOutStream = tmpOut;
         }
 
         public void run() {
             byte[] buffer = new byte[1024];
-            int bytes;
+            int bytes = 0;
+            boolean newDataFromBT = false;
+            boolean recvFromBTInProgress = false;
+            byte rc;
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-                    boolean newDataFromBT = false;
-                    boolean recvFromBTInProgress = false;
-                    byte ndx = 0;
-                    byte rc;
+                    bytes = 0;
                     // Send the obtained bytes to the UI Activity
-                    while (mmInStream.available() > 0 && newDataFromBT == false) {
-                        rc = (byte) mmInStream.read();
+                    if(mmInStream.available() > 0) {
+                        while (newDataFromBT == false) {
+                            rc = (byte) mmInStream.read();
 
-                        if (recvFromBTInProgress == true) {
-                            if (rc != Constants.MESSAGE_END) {
-                                buffer[ndx] = rc;
-                                ndx++;
-                            }
-                            else {
-                                buffer[ndx] = '\0'; // terminate the string
-                                recvFromBTInProgress = false;
-                                ndx = 0;
-                                newDataFromBT = true;
-                                mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                                        .sendToTarget();
+                            if (recvFromBTInProgress == true) {
+                                if (rc != Constants.MESSAGE_END) {
+                                    buffer[bytes] = rc;
+                                    bytes++;
+                                } else {
+                                    buffer[bytes] = '\0'; // terminate the string
+                                    recvFromBTInProgress = false;
+                                    newDataFromBT = true;
+                                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                                            .sendToTarget();
+                                }
+                            } else if (rc == Constants.MESSAGE_START) {
+                                recvFromBTInProgress = true;
                             }
                         }
-
-                        else if (rc == Constants.MESSAGE_START) {
-                            recvFromBTInProgress = true;
-                        }
+                    }else{
+                        SystemClock.sleep(100);
                     }
 
                 } catch (IOException e) {
