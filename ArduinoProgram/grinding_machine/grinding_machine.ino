@@ -1,11 +1,13 @@
 #include <SoftwareSerial.h>
 
+// Bluetooth connection variables
 unsigned int D2 = 2;
 unsigned int D3 = 3;
 unsigned int D4 = 4;
 SoftwareSerial BTSerial(D3,D2); // RX: port D2, TX port D3
-byte MESSAGE_START = 0x3C;
-byte MESSAGE_END = 0x3E;
+byte MESSAGE_START = 0x3C; // <
+byte MESSAGE_END = 0x3E; // >
+byte SEPARATOR = 0x3B; // ;
 
 const byte numBytes = 64;
 byte receivedBytesFromBT[numBytes];
@@ -15,6 +17,18 @@ byte numReceivedFromSerial = 0;
 
 boolean newDataFromBT = false;
 boolean newDataFromSerial = false;
+
+/* Speed variables and message types
+ * Communication protocol:
+ * < message_type ; value >
+ * */
+int receivedSpeedValue = 0;
+int currentSpeedValue = 0;
+int currentBatteryLevel = 0;
+
+char[] SPEED_CHANGE_COMMAND = "spd_cmd";
+char[] SPEED_VALUE = "spd_val";
+char[] BATTERY_VALUE = "bat_val";
 
 //====================================================================================================================
 
@@ -81,7 +95,6 @@ void showReceivedDataFromBT() {
         Serial.println();
         newDataFromBT = false;
     }
-
 }
 
 //====================================================================================================================
@@ -118,7 +131,6 @@ void recvFromSerialMonitorWithStartEndMarkers(){
             ndxSerial++;
         }
     }
-  
 }
 
 //====================================================================================================================
@@ -136,26 +148,75 @@ void sendReceivedDataFromSerialMonitor(){
 }
 
 //====================================================================================================================
-//
-//void sendMessage(byte[] message, int messageType){
-//  switch(messageType){
-//    case 1:
-//      break;
-//    default:
-//      break;l
-//  }
-//}
+
+void sendMessage(char[] message_type, char[] message_val){
+  // Add the message type and the value, separated by semi-colon
+  char* constructedMessage;
+  if(constructMessage(message_type, message_val, constructedMessage) == true){
+    for (byte n = 0; n < numReceivedFromSerial; n++) {
+      BTSerial.write(constructedMessage[n]);
+    }
+    delete[] constructedMessage;
+  }else{
+    return;    
+  }
+  
+}
 
 //====================================================================================================================
-//
-//bool addStartEndMarkers(char[] message){
-//  char* messageWithMarkers;
-//  if(strlen(message) + 3 >= numBytes){
-//    return false;
-//  }else{
-//    messageWithMarkers = new char[strlen(message) + 3];
-//    strcpy(messageWithMarkers, (char)MESSAGE_START);
-//    strcat(messageWithMarkers, message);
-//    strcpy(messageWithMarkers, (char)MESSAGE_END);
-//  }
-//}
+
+bool constructMessage(char[] message_type, char[] message_val, char* constructedMessage){
+  int constructedMessageLength = strlen(message_type) + strlen(message_val) + strlen(MESSAGE_START) + strlen(MESSAGE_END) + strlen(SEPARATOR) + 1; // we need +1 because of \n
+  if(constructedMessageLength >= numBytes){
+    return false;
+  }else{
+    constructedMessage = new char[constructedMessageLength];
+    strcpy(constructedMessage, (char)MESSAGE_START);
+    strcat(constructedMessage, message_type);
+    strcpy(constructedMessage, (char) SEPARATOR);
+    strcat(constructedMessage, message_val);
+    strcpy(constructedMessage, (char)MESSAGE_END);
+    return true;
+  }
+}
+
+//====================================================================================================================
+
+bool retrieveInformationFromCommand(char[] receivedMessage){
+  String stringMessage = String(receivedMessage);
+  String stringStart = String((char)MESSAGE_START);
+  String stringEnd = String((char)MESSAGE_END);
+  String stringSeparator = String((char)SEPARATOR);
+  String stringChangeSpeedCommand = String(SPEED_CHANGE_COMMAND);
+  
+  if(stringMessage.startsWith(stringStart) && stringMessage.endsWith(stringEnd)){
+    int separatorIdx = stringMessage.indexOf(stringSeparator);
+    String message_type = stringMessage.substring(1, separatorIdx - 1);
+    String message_val = stringMessage.substring(separatorIdx + 1 , stringMessage.length()-1);
+    
+    if(message_type.equals(stringChangeSpeedCommand)){
+      receivedSpeedValue = message_val.toInt();
+      return true;
+    }
+  }else{
+    return false;
+  }
+}
+
+//====================================================================================================================
+
+// Functions to update the speed value of the motor and the battery level (if possible).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
