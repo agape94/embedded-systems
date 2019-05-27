@@ -26,9 +26,9 @@ int receivedSpeedValue = 0;
 int currentSpeedValue = 0;
 int currentBatteryLevel = 0;
 
-char[] SPEED_CHANGE_COMMAND = "spd_cmd";
-char[] SPEED_VALUE = "spd_val";
-char[] BATTERY_VALUE = "bat_val";
+char SPEED_CHANGE_COMMAND[] = "spd_cmd";
+char SPEED_VALUE[] = "spd_val";
+char BATTERY_VALUE[] = "bat_val";
 
 //====================================================================================================================
 
@@ -49,7 +49,7 @@ void loop() {
     recvFromSerialMonitorWithStartEndMarkers();
     sendReceivedDataFromSerialMonitor();
 
-    //sendBatteryInformation();
+    //sendMessage(SPEED_VALUE, convertIntToChar(267));
 }
 
 //====================================================================================================================
@@ -93,6 +93,7 @@ void showReceivedDataFromBT() {
             Serial.write(receivedBytesFromBT[n]);
         }
         Serial.println();
+        retrieveInformationFromCommand((char*)receivedBytesFromBT);
         newDataFromBT = false;
     }
 }
@@ -138,10 +139,14 @@ void recvFromSerialMonitorWithStartEndMarkers(){
 void sendReceivedDataFromSerialMonitor(){
     if (newDataFromSerial == true) {
         for (byte n = 0; n < numReceivedFromSerial; n++) {
-            BTSerial.write(receivedBytesFromSerial[n]);
+            //BTSerial.write(receivedBytesFromSerial[n]);
             Serial.write(receivedBytesFromSerial[n]);
         }
         //BTSerial.write(receivedBytesFromSerial, numReceivedFromSerial);
+        char* message;
+        convertIntToChar(267, message);
+        sendMessage(SPEED_VALUE, message);
+        delete [] message;
         Serial.println();
         newDataFromSerial = false;
     }
@@ -149,12 +154,13 @@ void sendReceivedDataFromSerialMonitor(){
 
 //====================================================================================================================
 
-void sendMessage(char[] message_type, char[] message_val){
+void sendMessage(char message_type[], char message_val[]){
   // Add the message type and the value, separated by semi-colon
   char* constructedMessage;
   if(constructMessage(message_type, message_val, constructedMessage) == true){
     for (byte n = 0; n < numReceivedFromSerial; n++) {
       BTSerial.write(constructedMessage[n]);
+      Serial.write(constructedMessage[n]);
     }
     delete[] constructedMessage;
   }else{
@@ -165,58 +171,53 @@ void sendMessage(char[] message_type, char[] message_val){
 
 //====================================================================================================================
 
-bool constructMessage(char[] message_type, char[] message_val, char* constructedMessage){
-  int constructedMessageLength = strlen(message_type) + strlen(message_val) + strlen(MESSAGE_START) + strlen(MESSAGE_END) + strlen(SEPARATOR) + 1; // we need +1 because of \n
+bool constructMessage(char message_type[], char message_val[], char* constructedMessage){
+  int constructedMessageLength = strlen(message_type) + strlen(message_val) + 4; // we need +4 because of \n, start, end, and separator
   if(constructedMessageLength >= numBytes){
     return false;
   }else{
     constructedMessage = new char[constructedMessageLength];
-    strcpy(constructedMessage, (char)MESSAGE_START);
+    char message_start = (char)MESSAGE_START;
+    char message_separator = (char)SEPARATOR;
+    char message_end = (char)MESSAGE_END;
+    strcpy(constructedMessage, &message_start);
     strcat(constructedMessage, message_type);
-    strcpy(constructedMessage, (char) SEPARATOR);
+    strcpy(constructedMessage, &message_separator);
     strcat(constructedMessage, message_val);
-    strcpy(constructedMessage, (char)MESSAGE_END);
+    strcpy(constructedMessage, &message_end);
     return true;
   }
 }
 
 //====================================================================================================================
 
-bool retrieveInformationFromCommand(char[] receivedMessage){
+bool retrieveInformationFromCommand(char receivedMessage[]){
   String stringMessage = String(receivedMessage);
-  String stringStart = String((char)MESSAGE_START);
-  String stringEnd = String((char)MESSAGE_END);
   String stringSeparator = String((char)SEPARATOR);
   String stringChangeSpeedCommand = String(SPEED_CHANGE_COMMAND);
   
-  if(stringMessage.startsWith(stringStart) && stringMessage.endsWith(stringEnd)){
-    int separatorIdx = stringMessage.indexOf(stringSeparator);
-    String message_type = stringMessage.substring(1, separatorIdx - 1);
-    String message_val = stringMessage.substring(separatorIdx + 1 , stringMessage.length()-1);
-    
-    if(message_type.equals(stringChangeSpeedCommand)){
-      receivedSpeedValue = message_val.toInt();
-      return true;
-    }
+  int separatorIdx = stringMessage.indexOf(stringSeparator);
+  String message_type = stringMessage.substring(0, separatorIdx);
+  String message_val = stringMessage.substring(separatorIdx + 1 , stringMessage.length());
+  
+  if(message_type.equals(stringChangeSpeedCommand)){
+    receivedSpeedValue = message_val.toInt();
+    Serial.write("The speed value is: ");
+    Serial.print(receivedSpeedValue);
+    Serial.write("\n\n");
+    return true;
   }else{
-    return false;
+    Serial.write("\nERROR: Unknown command message!\n");
   }
 }
 
 //====================================================================================================================
 
+void convertIntToChar(int value, char* cstr){
+  cstr = new char[16];
+  itoa(value, cstr, 10);
+}
+
+//====================================================================================================================
+
 // Functions to update the speed value of the motor and the battery level (if possible).
-
-
-
-
-
-
-
-
-
-
-
-
-
-

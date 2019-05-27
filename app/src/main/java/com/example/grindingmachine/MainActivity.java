@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendNewRpmToGrindingMachine(){
         if(mBluetoothAdapter.isEnabled()) {
-            String message = constructMessage(Constans.CHANGE_SPEED_COMMAND , String.valueOf(mCurrentRPM));
+            String message = constructMessage(Constants.CHANGE_SPEED_COMMAND , String.valueOf(mCurrentRPM));
             sendMessage(message);
         }
     }
@@ -506,10 +506,10 @@ public class MainActivity extends AppCompatActivity {
         String message_type = readMessage.substring(0, separatorIdx);
         String message_val = readMessage.substring(separatorIdx + 1 , readMessage.length() - 1);
         
-        if(message_type.equals(Constans.CURRENT_SPEED_VALUE)){
+        if(message_type.equals(Constants.CURRENT_SPEED_VALUE)){
             mCurrentReceivedRPM = Integer.parseInt(message_val);
             // Set the text view to the last received RPM value
-        }else if(message_type.equals(Constans.CURRENT_BATTERY_LEVEL)){
+        }else if(message_type.equals(Constants.CURRENT_BATTERY_LEVEL)){
             mCurrentBatteryLevel = Integer.parseInt(message_val);
             // Set the text view for battery level to the last received value
         }
@@ -518,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
     //======================================================================================
     
     private String constructMessage(String message_type, String message_val){
-        return new String(Constans.MESSAGE_START + message_type + Constans.MESSAGE_SEPARATOR + message_val + Constans.MESSAGE_END);
+        return new String(Constants.MESSAGE_START + message_type + Constants.MESSAGE_SEPARATOR + message_val + Constants.MESSAGE_END);
     }
     
     //======================================================================================
