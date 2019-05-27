@@ -24,9 +24,6 @@ public class Constants {
     public static final int REQUEST_CONNECT_DEVICE = 1;
     public static final int REQUEST_ENABLE_BT = 2;
 
-    public static final char MESSAGE_START = '<';
-    public static final char MESSAGE_END = '>';
-
     // Constants for the settings activity
     public static String SET_SPEED_AUTOMATICALLY_KEY = "set_speed_automatically_preference";
     public static String MINIMUM_RPM_KEY = "minimum_speed_preference";
@@ -45,7 +42,16 @@ public class Constants {
     public static final int SAVE_SPEED_PROFILE_REQUEST_CODE = 9;
     public static final int START_SETTINGS_REQUEST_CODE = 10;
     public static final int EDIT_VIEW_SPEED_PROFILES_REQUEST_CODE = 11;
+
     public static final String SPEED_PROFILES_ACTIVITY_FOR = "start_speed_profiles_for";
     public static final String SPEED_PROFILE_SELECT_KEY = "load_speed_profile";
     public static final String SPEED_PROFILE_SAVE_KEY = "save_speed_profile";
+    
+        
+    public static final char MESSAGE_START = '<';
+    public static final char MESSAGE_END = '>';
+    public static final String CURRENT_SPEED_VALUE = "spd_val";
+    public static final String CHANGE_SPEED_COMMAND = "spd_cmd";
+    public static final String CURRENT_BATTERY_LEVEL = "bat_val";
+    public static final char MESSAGE_SEPARATOR = ';';
 }

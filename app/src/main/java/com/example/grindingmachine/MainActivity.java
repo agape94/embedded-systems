@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar mMotorSpeedSeekbar;
     private EditText mSetSpeedValue;
     private int mCurrentRPM;
+    private int mCurrentReceivedRPM = 0;
+    private int mCurrentBatteryLevel = 0;
     private Button mSetSpeedButton;
     private Button mLoadSpeedProfileButton;
     private Button mSaveSpeedProfileButton;
@@ -303,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    retrieveValueFromMessage(readMessage);
                     Toast.makeText(getApplicationContext(),readMessage,Toast.LENGTH_SHORT).show();
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
@@ -424,8 +427,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendNewRpmToGrindingMachine(){
         if(mBluetoothAdapter.isEnabled()) {
-            String message = String.valueOf(mCurrentRPM);
-            sendMessage(Constants.MESSAGE_START + message + Constants.MESSAGE_END);
+            String message = constructMessage(Constans.CHANGE_SPEED_COMMAND , String.valueOf(mCurrentRPM));
+            sendMessage(message);
         }
     }
 
@@ -495,5 +498,29 @@ public class MainActivity extends AppCompatActivity {
             mMotorSpeedSeekbar.setMax(Constants.MAXIMUM_RPM_VALUE - Constants.MINIMUM_RPM_VALUE);
         }
     }
+    
+    //======================================================================================
+    
+    private void retrieveValueFromMessage(String readMessage){
+        int separatorIdx = readMessage.indexOf(Constants.MESSAGE_SEPARATOR);
+        String message_type = readMessage.substring(0, separatorIdx);
+        String message_val = readMessage.substring(separatorIdx + 1 , readMessage.length() - 1);
+        
+        if(message_type.equals(Constans.CURRENT_SPEED_VALUE)){
+            mCurrentReceivedRPM = Integer.parseInt(message_val);
+            // Set the text view to the last received RPM value
+        }else if(message_type.equals(Constans.CURRENT_BATTERY_LEVEL)){
+            mCurrentBatteryLevel = Integer.parseInt(message_val);
+            // Set the text view for battery level to the last received value
+        }
+    }
 
+    //======================================================================================
+    
+    private String constructMessage(String message_type, String message_val){
+        return new String(Constans.MESSAGE_START + message_type + Constans.MESSAGE_SEPARATOR + message_val + Constans.MESSAGE_END);
+    }
+    
+    //======================================================================================
+    
 }
