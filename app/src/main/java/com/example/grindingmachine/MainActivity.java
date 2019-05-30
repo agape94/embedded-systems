@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,18 +27,21 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private SeekBar mMotorSpeedSeekbar;
     private EditText mSetSpeedValue;
+    private TextView mCurrentMotorSpeed;
     private int mCurrentRPM;
-    private int mCurrentReceivedRPM = 0;
+    private double mCurrentReceivedRPM = 0;
     private int mCurrentBatteryLevel = 0;
     private Button mSetSpeedButton;
     private Button mLoadSpeedProfileButton;
     private Button mSaveSpeedProfileButton;
+    private Button mStopButton;
     SharedPreferences mBluetoothSettings;
     private Menu mMenu;
     private boolean mSeekbarMoved = false;
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
 
         mMotorSpeedSeekbar = findViewById(R.id.motorSpeedSeekBar);
+        mCurrentMotorSpeed = findViewById(R.id.current_motor_speed);
         if(mMotorSpeedSeekbar.getMax() != Constants.MAXIMUM_RPM_VALUE)
         {
             mMotorSpeedSeekbar.setMax(Constants.MAXIMUM_RPM_VALUE - Constants.MINIMUM_RPM_VALUE);
@@ -241,6 +244,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mStopButton = findViewById(R.id.stop_speed_btn);
+        mStopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentRPM = 0;
+                sendNewRpmToGrindingMachine();
+                mSetSpeedValue.setText(String.valueOf(mCurrentRPM));
+            }
+        });
+
     }
 
     //======================================================================================
@@ -306,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     retrieveValueFromMessage(readMessage);
-                    Toast.makeText(getApplicationContext(),readMessage,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),readMessage,Toast.LENGTH_SHORT).show();
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -507,8 +520,9 @@ public class MainActivity extends AppCompatActivity {
         String message_val = readMessage.substring(separatorIdx + 1 , readMessage.length() - 1);
         
         if(message_type.equals(Constants.CURRENT_SPEED_VALUE)){
-            mCurrentReceivedRPM = Integer.parseInt(message_val);
+            mCurrentReceivedRPM = Double.parseDouble(message_val);
             // Set the text view to the last received RPM value
+            mCurrentMotorSpeed.setText(message_val + " RPM");
         }else if(message_type.equals(Constants.CURRENT_BATTERY_LEVEL)){
             mCurrentBatteryLevel = Integer.parseInt(message_val);
             // Set the text view for battery level to the last received value

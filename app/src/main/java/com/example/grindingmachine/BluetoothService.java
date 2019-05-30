@@ -397,11 +397,11 @@ public class BluetoothService {
         public void run() {
             byte[] buffer = new byte[1024];
             int bytes = 0;
-            boolean newDataFromBT = false;
             boolean recvFromBTInProgress = false;
             byte rc;
             // Keep listening to the InputStream while connected
             while (true) {
+                boolean newDataFromBT = false;
                 try {
                     // Read from the InputStream
                     bytes = 0;
@@ -426,7 +426,7 @@ public class BluetoothService {
                             }
                         }
                     }else{
-                        SystemClock.sleep(100);
+                        SystemClock.sleep(5);
                     }
 
                 } catch (IOException e) {

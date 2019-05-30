@@ -36,4 +36,5 @@
     <string name="bt_activated">Bluetooth activated!</string>
     <string name="new_speed_profile">New speed profile</string>
     <string name="edit_speed_profile">Edit speed profile</string>
+    <string name="stop">STOP</string>
 </resources>
