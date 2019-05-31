@@ -279,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
                     mMotorSpeedSeekbar.setProgress(mCurrentRPM - Constants.MINIMUM_RPM_VALUE, true);
                 }
             }else{
-                mSetSpeedValue.setError("The RPM value should be between " + Constants.MINIMUM_RPM_VALUE
-                + " and " + Constants.MAXIMUM_RPM_VALUE);
+                //mSetSpeedValue.setError("The RPM value should be between " + Constants.MINIMUM_RPM_VALUE
+                //+ " and " + Constants.MAXIMUM_RPM_VALUE);
             }
         }else{
             if(!mSeekbarMoved) {
